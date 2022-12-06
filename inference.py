@@ -25,6 +25,9 @@ import yaml
 parser = ArgumentParser()
 parser.add_argument('--config', type=FileType(mode='r'), default=None)
 parser.add_argument('--protein_ligand_csv', type=str, default=None, help='Path to a .csv file specifying the input as described in the README. If this is not None, it will be used instead of the --protein_path and --ligand parameters')
+parser.add_argument('--start', type=int, default=0, help='Index of the first protein-ligand pair to process')
+parser.add_argument('--end', type=int, default=None, help='Index of the last protein-ligand pair to process')
+
 parser.add_argument('--protein_path', type=str, default='data/dummy_data/1a0q_protein.pdb', help='Path to the protein .pdb file')
 parser.add_argument('--ligand', type=str, default='COc(cc1)ccc1C#N', help='Either a SMILES string or the path to a molecule file that rdkit can read')
 parser.add_argument('--out_dir', type=str, default='results/user_inference', help='Directory where the outputs will be written to')
@@ -71,8 +74,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 if args.protein_ligand_csv is not None:
     df = pd.read_csv(args.protein_ligand_csv)
-    protein_path_list = df['protein_path'].tolist()
-    ligand_descriptions = df['ligand'].tolist()
+    protein_path_list = df['protein_path'].tolist()[args.start : args.end]
+    ligand_descriptions = df['ligand'].tolist()[args.start : args.end]
 else:
     protein_path_list = [args.protein_path]
     ligand_descriptions = [args.ligand]
